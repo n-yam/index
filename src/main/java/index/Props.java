@@ -15,7 +15,7 @@ final class Props {
 		}
 	}
 
-	public static int getServerPort() {
+	static int getServerPort() {
 		var port = props.getProperty("server.port");
 		return Integer.valueOf(port);
 	}

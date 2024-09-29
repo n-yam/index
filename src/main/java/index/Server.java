@@ -23,9 +23,22 @@ final class Server {
 						var bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 						var bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream))) {
 
-					int status = 200;
-					var body = readStaticFile("static/index.html");
-					var response = new Response(status, body);
+					var request = RequestParser.parse(bufferedReader);
+					var response = new Response(404, "<p>NOT FOUND</p>", "text/html");
+					
+					if (request.getUri().equals("/")) {
+						response = new ResponseBuilder()
+								.status(200)
+								.body(readStaticFile("static/index.html"))
+								.contentType("text/html").build();
+					}
+					
+					if (request.getUri().equals("/main.js")) {
+						response = new ResponseBuilder()
+								.status(200)
+								.body(readStaticFile("static/main.js"))
+								.contentType("text/javascript").build();
+					}
 
 					bufferedWriter.write(response.toString());
 					bufferedWriter.flush();

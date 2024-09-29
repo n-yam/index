@@ -3,10 +3,12 @@ package index;
 class Response {
 	private int status;
 	private String body;
-
-	public Response(int status, String body) {
+	private String contentType;
+	
+	Response(int status, String body, String contentType) {
 		this.status = status;
 		this.body = body;
+		this.contentType = contentType;
 	}
 
 	@Override
@@ -17,11 +19,16 @@ class Response {
 				HTTP/1.1 #STATUS#
 				Server: index
 				Connection: close
-				Content-Type: text/html
+				Content-Type: #CONTENT_TYPE#
 				Content-Length: #LENGTH#
 
 				#HTML#
-				""".replaceFirst("#STATUS#", status).replaceFirst("#LENGTH#", length).replaceFirst("#HTML#", body);
+				"""
+				.replaceFirst("#STATUS#", status)
+				.replaceFirst("#CONTENT_TYPE#", contentType)
+				.replaceFirst("#LENGTH#", length)
+				.replaceFirst("#HTML#", body);
+
 		return response;
 	}
 }

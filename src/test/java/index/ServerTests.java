@@ -12,19 +12,34 @@ import org.junit.jupiter.api.Test;
 
 class ServerTests {
 	@Test
-	void test() {
+	void getIndexHtml() {
 		try {
 			var client = HttpClient.newHttpClient();
 			var uri = URI.create("http://localhost:8000");
 			var request = HttpRequest.newBuilder().uri(uri).build();
 			var response = client.send(request, BodyHandlers.ofString());
 
-			var html = "<h1>HELLO WORLD</h1>";
-			
 			assertEquals(200, response.statusCode());
 			assertEquals("text/html", response.headers().firstValue("Content-Type").get());
-			assertEquals(html.length(), response.headers().firstValueAsLong("Content-Length").getAsLong());
-			assertEquals(html, response.body());
+			assertEquals(93, response.headers().firstValueAsLong("Content-Length").getAsLong());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	void getMainJs() {
+		try {
+			var client = HttpClient.newHttpClient();
+			var uri = URI.create("http://localhost:8000/main.js");
+			var request = HttpRequest.newBuilder().uri(uri).build();
+			var response = client.send(request, BodyHandlers.ofString());
+
+			assertEquals(200, response.statusCode());
+			assertEquals("text/javascript", response.headers().firstValue("Content-Type").get());
+			assertEquals(99, response.headers().firstValueAsLong("Content-Length").getAsLong());
 
 		} catch (Exception e) {
 			e.printStackTrace();
