@@ -2,7 +2,8 @@ package index;
 
 final class Main {
 	public static void main(String[] args) {
-		var server = new Server(8000);
+		int port = Props.getServerPort();
+		var server = new Server(port);
 		server.start();
 	}
 }
