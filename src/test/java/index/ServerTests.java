@@ -21,7 +21,7 @@ class ServerTests {
 
 			assertEquals(200, response.statusCode());
 			assertEquals("text/html", response.headers().firstValue("Content-Type").get());
-			assertEquals(152, response.headers().firstValueAsLong("Content-Length").getAsLong());
+			assertEquals(213, response.headers().firstValueAsLong("Content-Length").getAsLong());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -57,7 +57,25 @@ class ServerTests {
 
 			assertEquals(200, response.statusCode());
 			assertEquals("text/css", response.headers().firstValue("Content-Type").get());
-			assertEquals(33, response.headers().firstValueAsLong("Content-Length").getAsLong());
+			assertEquals(53, response.headers().firstValueAsLong("Content-Length").getAsLong());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+	
+	@Test
+	void getFaviconIco() {
+		try {
+			var client = HttpClient.newHttpClient();
+			var uri = URI.create("http://localhost:8000/favicon.ico");
+			var request = HttpRequest.newBuilder().uri(uri).build();
+			var response = client.send(request, BodyHandlers.ofString());
+
+			assertEquals(200, response.statusCode());
+			assertEquals("image/x-icon", response.headers().firstValue("Content-Type").get());
+			assertEquals(15406, response.headers().firstValueAsLong("Content-Length").getAsLong());
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,34 +1,35 @@
 package index;
 
-class Response {
+class ResponseHeaders {
 	private int status;
-	private String body;
+	private int contentLength;
 	private String contentType;
 	
-	Response(int status, String body, String contentType) {
+	ResponseHeaders(int status, int contentLength, String contentType) {
 		this.status = status;
-		this.body = body;
+		this.contentLength = contentLength;
 		this.contentType = contentType;
+	}
+	
+	String getContentType() {
+		return contentType;
 	}
 
 	@Override
 	public String toString() {
 		var status = String.valueOf(this.status);
-		var length = String.valueOf(body.length());
-		var response = """
+		var length = String.valueOf(contentLength);
+		var headers = """
 				HTTP/1.1 #STATUS#
 				Server: index
 				Connection: close
 				Content-Type: #CONTENT_TYPE#
 				Content-Length: #LENGTH#
-
-				#HTML#
 				"""
 				.replaceFirst("#STATUS#", status)
 				.replaceFirst("#CONTENT_TYPE#", contentType)
-				.replaceFirst("#LENGTH#", length)
-				.replaceFirst("#HTML#", body);
+				.replaceFirst("#LENGTH#", length);
 
-		return response;
+		return headers;
 	}
 }

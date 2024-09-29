@@ -19,43 +19,76 @@ final class Server {
 			while (true) {
 				try (var clientSocket = serverSocket.accept();
 						var inputStream = clientSocket.getInputStream();
-						var outputStream = clientSocket.getOutputStream();
-						var bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-						var bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream))) {
+						var bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
 
 					var request = RequestParser.parse(bufferedReader);
-					var response = new Response(404, "<p>NOT FOUND</p>", "text/html");
+
+					var body = "<p>NOT FOUND</p>";
+					var headers = new ResponseHeaders(404, body.length(), "text/html");
 					
 					if (request.getUri().equals("/")) {
-						response = new ResponseBuilder()
+						body = readStaticFile("static/index.html");
+						headers = new ResponseHeadersBuilder()
 								.status(200)
-								.body(readStaticFile("static/index.html"))
+								.contentLength(body.length())
 								.contentType("text/html").build();
 					}
 					
 					if (request.getUri().equals("/main.js")) {
-						response = new ResponseBuilder()
+						body = readStaticFile("static/main.js");
+						headers = new ResponseHeadersBuilder()
 								.status(200)
-								.body(readStaticFile("static/main.js"))
+								.contentLength(body.length())
 								.contentType("text/javascript").build();
 					}
 					
 					if (request.getUri().equals("/")) {
-						response = new ResponseBuilder()
+						body = readStaticFile("static/index.html");
+						headers = new ResponseHeadersBuilder()
 								.status(200)
-								.body(readStaticFile("static/index.html"))
+								.contentLength(body.length())
 								.contentType("text/html").build();
 					}
 					
 					if (request.getUri().equals("/styles.css")) {
-						response = new ResponseBuilder()
+						body = readStaticFile("static/styles.css");
+						headers = new ResponseHeadersBuilder()
 								.status(200)
-								.body(readStaticFile("static/styles.css"))
+								.contentLength(body.length())
 								.contentType("text/css").build();
 					}
+					
+					if (request.getUri().equals("/favicon.ico")) {
+						headers = new ResponseHeadersBuilder()
+								.status(200)
+								.contentLength(15406)
+								.contentType("image/x-icon").build();
+					}
+					
+					var outputStream = clientSocket.getOutputStream();
+					var bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+					
+					try {
+						// Write headers
+						bufferedWriter.write(headers.toString());
+						bufferedWriter.write("\r\n");
+						bufferedWriter.flush();
 
-					bufferedWriter.write(response.toString());
-					bufferedWriter.flush();
+						if (headers.getContentType().equals("image/x-icon")) {
+							// Write binary body
+							try (var is = new ClassLoader(){}.getResourceAsStream("static/favicon.ico")){
+								is.transferTo(outputStream);	
+							}
+						} else {
+							// Write string body
+							bufferedWriter.write(body.toString());
+							bufferedWriter.flush();
+						}
+						
+					} finally {
+						bufferedWriter.close();
+						outputStream.close();
+					}
 				}
 			}
 		} catch (IOException e) {
