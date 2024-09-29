@@ -39,6 +39,20 @@ final class Server {
 								.body(readStaticFile("static/main.js"))
 								.contentType("text/javascript").build();
 					}
+					
+					if (request.getUri().equals("/")) {
+						response = new ResponseBuilder()
+								.status(200)
+								.body(readStaticFile("static/index.html"))
+								.contentType("text/html").build();
+					}
+					
+					if (request.getUri().equals("/styles.css")) {
+						response = new ResponseBuilder()
+								.status(200)
+								.body(readStaticFile("static/styles.css"))
+								.contentType("text/css").build();
+					}
 
 					bufferedWriter.write(response.toString());
 					bufferedWriter.flush();

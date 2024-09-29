@@ -21,7 +21,7 @@ class ServerTests {
 
 			assertEquals(200, response.statusCode());
 			assertEquals("text/html", response.headers().firstValue("Content-Type").get());
-			assertEquals(93, response.headers().firstValueAsLong("Content-Length").getAsLong());
+			assertEquals(152, response.headers().firstValueAsLong("Content-Length").getAsLong());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -40,6 +40,24 @@ class ServerTests {
 			assertEquals(200, response.statusCode());
 			assertEquals("text/javascript", response.headers().firstValue("Content-Type").get());
 			assertEquals(99, response.headers().firstValueAsLong("Content-Length").getAsLong());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+	
+	@Test
+	void getStylesCss() {
+		try {
+			var client = HttpClient.newHttpClient();
+			var uri = URI.create("http://localhost:8000/styles.css");
+			var request = HttpRequest.newBuilder().uri(uri).build();
+			var response = client.send(request, BodyHandlers.ofString());
+
+			assertEquals(200, response.statusCode());
+			assertEquals("text/css", response.headers().firstValue("Content-Type").get());
+			assertEquals(33, response.headers().firstValueAsLong("Content-Length").getAsLong());
 
 		} catch (Exception e) {
 			e.printStackTrace();
