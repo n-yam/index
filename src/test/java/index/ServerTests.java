@@ -19,8 +19,12 @@ class ServerTests {
 			var request = HttpRequest.newBuilder().uri(uri).build();
 			var response = client.send(request, BodyHandlers.ofString());
 
+			var html = "<h1>HELLO WORLD</h1>";
+			
 			assertEquals(200, response.statusCode());
-			assertEquals("<h1>HELLO WORLD</h1>", response.body());
+			assertEquals("text/html", response.headers().firstValue("Content-Type").get());
+			assertEquals(html.length(), response.headers().firstValueAsLong("Content-Length").getAsLong());
+			assertEquals(html, response.body());
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -23,21 +23,29 @@ final class Server {
 						var bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 						var bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream))) {
 
-					var response = """
-							HTTP/1.1 200
-							Server: index
-							Content-Type: text/html
-							Connection: close
-							Content-Length: 20
-							
-							<h1>HELLO WORLD</h1>
-							""";
-					bufferedWriter.write(response);
+					int status = 200;
+					var body = readStaticFile("static/index.html");
+					var response = new Response(status, body);
+
+					bufferedWriter.write(response.toString());
 					bufferedWriter.flush();
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String readStaticFile(String path) throws IOException {
+		var classLoader = new ClassLoader() {
+			String getResourceAsString(String name) throws IOException {
+				var inputStream = this.getResourceAsStream(name);
+				var content = new String(inputStream.readAllBytes());
+				return content;
+			}
+		};
+		var content = classLoader.getResourceAsString(path);
+
+		return content;
 	}
 }
