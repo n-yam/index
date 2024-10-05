@@ -8,9 +8,24 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class ServerTests {
+	@BeforeAll
+	static void beforeAll() {
+		var server = new Server(8000);
+		var thread = new Thread(() -> server.start());
+		thread.setDaemon(true);
+		thread.start();
+
+		try {
+			Thread.sleep(100); // milliseconds
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Test
 	void getIndexHtml() {
 		try {
