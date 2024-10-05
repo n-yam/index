@@ -3,6 +3,7 @@ package index;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
@@ -27,7 +28,7 @@ final class Server {
 					var headers = new ResponseHeaders(404, body.length(), "text/html");
 					
 					if (request.getUri().equals("/")) {
-						body = readStaticFile("static/index.html");
+						body = getResourceAsString("static/index.html");
 						headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(body.length())
@@ -35,7 +36,7 @@ final class Server {
 					}
 					
 					if (request.getUri().equals("/main.js")) {
-						body = readStaticFile("static/main.js");
+						body = getResourceAsString("static/main.js");
 						headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(body.length())
@@ -43,7 +44,7 @@ final class Server {
 					}
 					
 					if (request.getUri().equals("/")) {
-						body = readStaticFile("static/index.html");
+						body = getResourceAsString("static/index.html");
 						headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(body.length())
@@ -51,7 +52,7 @@ final class Server {
 					}
 					
 					if (request.getUri().equals("/styles.css")) {
-						body = readStaticFile("static/styles.css");
+						body = getResourceAsString("static/styles.css");
 						headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(body.length())
@@ -76,7 +77,7 @@ final class Server {
 
 						if (headers.getContentType().equals("image/x-icon")) {
 							// Write binary body
-							try (var is = new ClassLoader(){}.getResourceAsStream("static/favicon.ico")){
+							try (var is =getResourceAsStream("static/favicon.ico")){
 								is.transferTo(outputStream);	
 							}
 						} else {
@@ -96,16 +97,13 @@ final class Server {
 		}
 	}
 
-	private String readStaticFile(String path) throws IOException {
-		var classLoader = new ClassLoader() {
-			String getResourceAsString(String name) throws IOException {
-				var inputStream = this.getResourceAsStream(name);
-				var content = new String(inputStream.readAllBytes());
-				return content;
-			}
-		};
-		var content = classLoader.getResourceAsString(path);
-
+	private String getResourceAsString(String path) throws IOException {
+		var inputStream = this.getClass().getClassLoader().getResourceAsStream(path);
+		var content = new String(inputStream.readAllBytes());
 		return content;
+	}
+	
+	private InputStream getResourceAsStream(String path) throws IOException {
+		return this.getClass().getClassLoader().getResourceAsStream(path);
 	}
 }
