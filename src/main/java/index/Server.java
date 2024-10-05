@@ -1,11 +1,9 @@
 package index;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 
 final class Server {
@@ -23,72 +21,56 @@ final class Server {
 						var bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
 
 					var request = RequestParser.parse(bufferedReader);
+					var writer = new ResponseWriter(clientSocket);
 
-					var body = "<p>NOT FOUND</p>";
-					var headers = new ResponseHeaders(404, body.length(), "text/html");
-					
 					if (request.getUri().equals("/")) {
-						body = getResourceAsString("static/index.html");
-						headers = new ResponseHeadersBuilder()
+						var body = getResourceAsString("static/index.html");
+						var headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(body.length())
 								.contentType("text/html").build();
+						writer.write(headers, body);
+						continue;
 					}
 					
 					if (request.getUri().equals("/main.js")) {
-						body = getResourceAsString("static/main.js");
-						headers = new ResponseHeadersBuilder()
+						var body = getResourceAsString("static/main.js");
+						var headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(body.length())
 								.contentType("text/javascript").build();
+						writer.write(headers, body);
+						continue;
 					}
 					
 					if (request.getUri().equals("/")) {
-						body = getResourceAsString("static/index.html");
-						headers = new ResponseHeadersBuilder()
+						var body = getResourceAsString("static/index.html");
+						var headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(body.length())
 								.contentType("text/html").build();
+						writer.write(headers, body);
+						continue;
 					}
 					
 					if (request.getUri().equals("/styles.css")) {
-						body = getResourceAsString("static/styles.css");
-						headers = new ResponseHeadersBuilder()
+						var body = getResourceAsString("static/styles.css");
+						var headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(body.length())
 								.contentType("text/css").build();
+						writer.write(headers, body);
+						continue;
 					}
 					
 					if (request.getUri().equals("/favicon.ico")) {
-						headers = new ResponseHeadersBuilder()
+						var body = getResourceAsStream("static/favicon.ico");
+						var headers = new ResponseHeadersBuilder()
 								.status(200)
 								.contentLength(15406)
 								.contentType("image/x-icon").build();
-					}
-					
-					var outputStream = clientSocket.getOutputStream();
-					var bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
-					
-					try {
-						// Write headers
-						bufferedWriter.write(headers.toString());
-						bufferedWriter.write("\r\n");
-						bufferedWriter.flush();
-
-						if (headers.getContentType().equals("image/x-icon")) {
-							// Write binary body
-							try (var is =getResourceAsStream("static/favicon.ico")){
-								is.transferTo(outputStream);	
-							}
-						} else {
-							// Write string body
-							bufferedWriter.write(body.toString());
-							bufferedWriter.flush();
-						}
-						
-					} finally {
-						bufferedWriter.close();
-						outputStream.close();
+						writer.write(headers, body);
+						continue;
 					}
 				}
 			}
