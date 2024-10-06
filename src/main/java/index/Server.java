@@ -43,16 +43,6 @@ final class Server {
 						continue;
 					}
 					
-					if (request.getUri().equals("/")) {
-						var body = getResourceAsString("static/index.html");
-						var headers = new ResponseHeadersBuilder()
-								.status(200)
-								.contentLength(body.length())
-								.contentType("text/html").build();
-						writer.write(headers, body);
-						continue;
-					}
-					
 					if (request.getUri().equals("/styles.css")) {
 						var body = getResourceAsString("static/styles.css");
 						var headers = new ResponseHeadersBuilder()
