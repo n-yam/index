@@ -12,4 +12,8 @@ final class FlashcardService {
 	List<Flashcard> getAll() {
 		return flashcardRepository.findAll();
 	}
+	
+	void add(Flashcard flashcard) {
+		flashcardRepository.add(flashcard);
+	}
 }

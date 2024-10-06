@@ -65,7 +65,7 @@ final class Server {
 						continue;
 					}
 					
-					if (request.getUri().equals("/api/flashcards")) {
+					if (request.getUri().equals("/api/flashcards") && request.getMethod().equals("GET")) {
 						var flashcards = flashcardService.getAll();
 						var body = Json.dumps(flashcards);
 						var headers = new ResponseHeadersBuilder()
@@ -73,6 +73,28 @@ final class Server {
 								.contentLength(body.length())
 								.contentType("application/json").build();
 						writer.write(headers, body);
+						continue;
+					}
+					
+					if (request.getUri().equals("/api/flashcards") && request.getMethod().equals("POST")) {
+						
+						var flashcard = new Flashcard();
+												
+						for (var part : request.getParts()) {
+							flashcard.setId(1);
+							if (part.getName().equals("frontText"))
+								flashcard.setFrontText(part.getValue());
+							if (part.getName().equals("backText"))
+								flashcard.setBackText(part.getValue());
+						}
+						
+						flashcardService.add(flashcard);
+						
+						var headers = new ResponseHeadersBuilder()
+								.status(200)
+								.contentLength(0)
+								.contentType("application/json").build();
+						writer.write(headers, "");
 						continue;
 					}
 				}

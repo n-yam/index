@@ -5,6 +5,9 @@ final class Flashcard {
 	private String frontText;
 	private String backText;
 
+	Flashcard() {
+	}
+	
 	Flashcard(long id, String frontText, String backText) {
 		this.id = id;
 		this.frontText = frontText;
