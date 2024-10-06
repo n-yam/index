@@ -8,9 +8,11 @@ import java.net.ServerSocket;
 
 final class Server {
 	private int port;
+	private FlashcardService flashcardService;
 
-	public Server(int port) {
+	public Server(int port, IFlashcardRepository flashcardRepository) {
 		this.port = port;
+		this.flashcardService = new FlashcardService(flashcardRepository);
 	}
 
 	public void start() {
@@ -59,6 +61,17 @@ final class Server {
 								.status(200)
 								.contentLength(15406)
 								.contentType("image/x-icon").build();
+						writer.write(headers, body);
+						continue;
+					}
+					
+					if (request.getUri().equals("/api/flashcards")) {
+						var flashcards = flashcardService.getAll();
+						var body = Json.dumps(flashcards);
+						var headers = new ResponseHeadersBuilder()
+								.status(200)
+								.contentLength(body.length())
+								.contentType("application/json").build();
 						writer.write(headers, body);
 						continue;
 					}

@@ -14,7 +14,8 @@ import org.junit.jupiter.api.Test;
 class ServerTests {
 	@BeforeAll
 	static void beforeAll() {
-		var server = new Server(8000);
+		var flashcardRepository = new RamFlashcardRepository();
+		var server = new Server(8000, flashcardRepository);
 		var thread = new Thread(() -> server.start());
 		thread.setDaemon(true);
 		thread.start();
@@ -91,6 +92,25 @@ class ServerTests {
 			assertEquals(200, response.statusCode());
 			assertEquals("image/x-icon", response.headers().firstValue("Content-Type").get());
 			assertEquals(15406, response.headers().firstValueAsLong("Content-Length").getAsLong());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+	
+	@Test
+	void getAllFlashcards() {
+		try {
+			var client = HttpClient.newHttpClient();
+			var uri = URI.create("http://localhost:8000/api/flashcards");
+			var request = HttpRequest.newBuilder().uri(uri).build();
+			var response = client.send(request, BodyHandlers.ofString());
+
+			assertEquals(200, response.statusCode());
+			assertEquals("application/json", response.headers().firstValue("Content-Type").get());
+			assertEquals(response.body().length(), response.headers().firstValueAsLong("Content-Length").getAsLong());
+			assertEquals("[]", response.body());
 
 		} catch (Exception e) {
 			e.printStackTrace();
